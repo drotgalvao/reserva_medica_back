@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  cpf            String
+  email          String
+  cellphone      String
+  password       String
+  type           String
+  zipcode        String
+  addressDetails String?
+  createdAt      DateTime @default(now())
+  Doctor         Doctor?
+  Patient        Patient?
+}
+
+model Doctor {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  specialty              String
+  registrationNumber     String
+  diplomaImage           String?
+  privateConsultationFee Float
+  User                   User     @relation(fields: [userId], references: [id])
+  Appointment            Appointment[]
+}
+
+model Patient {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  healthPlanId          Int
+  emergencyContactName  String
+  emergencyContactPhone String
+  medicalHistory        String?
+  currentMedication     String?
+  User                  User     @relation(fields: [userId], references: [id])
+}
+
+model Appointment {
+  id         String   @id @default(uuid())
+  doctorId   String 
+  patientId  Int
+  scheduleId Int
+  dateTime   DateTime
+  status     String
+  notes      String?
+  Doctor     Doctor   @relation(fields: [doctorId], references: [id])
+}
+
+model HealthPlan {
+  id              String   @id @default(uuid())
+  name            String
+  coverageDetails String?
+}
+
+model DoctorHealthPlan {
+ doctorId     Int
+ healthPlanId Int 
+ @@id([doctorId, healthPlanId])
+}
+
+model DoctorSchedule {
+ id        String   @id @default(uuid())
+ doctorId   Int 
+ dayOfWeek   String 
+ startTime   DateTime 
+ endTime     DateTime 
+}
+
