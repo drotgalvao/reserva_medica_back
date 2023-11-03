@@ -67,6 +67,23 @@ class UserController {
       res.status(500).send({ message: "Houve um erro interno" });
     }
   }
+
+  async deleteUser(req, res) {
+    try {
+      const { id } = req.params;
+      const deletedUser = await userService.deleteUser(id);
+
+      if (deletedUser.code && deletedUser.message) {
+        res.status(deletedUser.code).send({ message: deletedUser.message });
+        return;
+      }
+
+      res.status(200).send({ message: "Usuário deletado com sucesso" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Erro interno do servidor" });
+    }
+  }
 }
 
 module.exports = new UserController();

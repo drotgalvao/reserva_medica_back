@@ -41,15 +41,16 @@ class UserService {
         return { code: 400, message: "CPF já cadastrado em nosso sistema" };
       }
 
-      const isCellphoneUnique =
-        await userRepository.findUserByCellphone(userData.cellphone);
+      const isCellphoneUnique = await userRepository.findUserByCellphone(
+        userData.cellphone
+      );
       if (isCellphoneUnique) {
         return { code: 400, message: "Celular já cadastrado em nosso sistema" };
       }
 
       delete userData.confirmPassword;
       const newUser = await userRepository.createUser(userData);
-      delete newUser.password
+      delete newUser.password;
       return newUser;
     } catch (error) {
       console.error(error);
@@ -82,7 +83,6 @@ class UserService {
 
   async updateUser(id, updateData) {
     try {
-      // Extract only the fields that can be updated
       const {
         firstName,
         lastName,
@@ -93,7 +93,6 @@ class UserService {
         addressDetails,
       } = updateData;
 
-      // Create a new object with only the fields to update
       const dataToUpdate = {
         firstName,
         lastName,
@@ -103,12 +102,10 @@ class UserService {
         addressDetails,
       };
 
-      // Remove undefined properties
       Object.keys(dataToUpdate).forEach(
         (key) => dataToUpdate[key] === undefined && delete dataToUpdate[key]
       );
 
-      // Validate each field if it exists in the updateData
       if (dataToUpdate.firstName) {
         const firstNameError = UserValidation.isValidFirstName(
           dataToUpdate.firstName
@@ -130,7 +127,6 @@ class UserService {
         );
         if (cellphoneError) return cellphoneError;
 
-        // Check if cellphone is unique
         const isCellphoneUnique =
           await userRepository.findUserByCellphone(cellphone);
         if (isCellphoneUnique && isCellphoneUnique.id !== id) {
@@ -157,15 +153,31 @@ class UserService {
         if (zipcodeError) return zipcodeError;
       }
 
-      // If all checks pass, update the user
       const updatedUser = await userRepository.updateUser(id, dataToUpdate);
-      delete updatedUser.password
+      delete updatedUser.password;
       return updatedUser;
     } catch (error) {
       console.error(error);
       return { code: 500, message: "Houve um erro interno" };
     }
   }
+
+  async deleteUser(id) {
+    try {
+      const user = await userRepository.findUserById(id);
+
+      if (!user) {
+        return { code: 404, message: "Usuário não encontrado" };
+      }
+
+      const deletedUser = await userRepository.deleteUser(id);
+      return deletedUser;
+    } catch (error) {
+      console.error(error);
+      return { code: 500, message: "Erro interno do servidor" };
+    }
+  }
+  
 }
 
 module.exports = new UserService();

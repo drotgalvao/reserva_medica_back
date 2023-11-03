@@ -65,6 +65,18 @@ class UserRepository {
       data: updateData,
     });
   }
+
+  async deleteUser(id) {
+    try {
+      const deletedUser = await prismaClient.user.delete({
+        where: { id: id },
+      });
+      return deletedUser;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new UserRepository();
