@@ -56,9 +56,13 @@ class UserRepository {
   }
 
   async getAllUsers() {
-    return await prismaClient.user.findMany();
+    const users = await prismaClient.user.findMany();
+    users.forEach((user) => {
+      delete user.password;
+    });
+    return users;
   }
-
+  
   async updateUser(id, updateData) {
     return await prismaClient.user.update({
       where: { id: id },
