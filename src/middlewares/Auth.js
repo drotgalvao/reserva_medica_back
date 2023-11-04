@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const jwtToken = require("../utils/JwtToken");
 
 class Auth {
   authenticateToken(req, res, next) {
@@ -11,7 +11,7 @@ class Auth {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwtToken.verify(token);
       req.user = decoded;
       next();
     } catch (ex) {
@@ -21,37 +21,44 @@ class Auth {
 
   authorizePatient(req, res, next) {
     if (req.user.type !== "PATIENT") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Acesso negado. Você não tem permissão para acessar este recurso.",
-        });
+      return res.status(403).json({
+        message:
+          "Acesso negado. Você não tem permissão para acessar este recurso.",
+      });
     }
     next();
   }
 
   authorizeDoctor(req, res, next) {
     if (req.user.type !== "DOCTOR") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Acesso negado. Você não tem permissão para acessar este recurso.",
-        });
+      return res.status(403).json({
+        message:
+          "Acesso negado. Você não tem permissão para acessar este recurso.",
+      });
     }
     next();
   }
 
   authorizeAdmin(req, res, next) {
     if (req.user.type !== "ADMIN") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Acesso negado. Você não tem permissão para acessar este recurso.",
-        });
+      return res.status(403).json({
+        message:
+          "Acesso negado. Você não tem permissão para acessar este recurso.",
+      });
     }
+    next();
+  }
+
+  verifySelf(req, res, next) {
+    const { id } = req.params;
+
+    if (String(req.user.userId) !== String(id)) {
+      return res.status(403).json({
+        message:
+          "Você não tem permissão para atualizar os dados de outro usuário.",
+      });
+    }
+
     next();
   }
 }
