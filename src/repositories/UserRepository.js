@@ -1,7 +1,12 @@
 const { prismaClient } = require("../config/prismaClient");
+const bcrypt = require("bcrypt");
+const saltRounds = Number(process.env.SALT_ROUNDS);
 
 class UserRepository {
   async createUser(userData) {
+
+    userData.password = await bcrypt.hash(userData.password, saltRounds);
+
     return await prismaClient.user.create({
       data: userData,
     });
@@ -64,6 +69,14 @@ class UserRepository {
   }
   
   async updateUser(id, updateData) {
+
+        if (updateData.password) {
+          updateData.password = await bcrypt.hash(
+            updateData.password,
+            saltRounds
+          );
+        }
+
     return await prismaClient.user.update({
       where: { id: id },
       data: updateData,

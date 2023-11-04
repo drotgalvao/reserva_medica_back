@@ -1,8 +1,6 @@
 const userRepository = require("../repositories/UserRepository");
 const { UserValidation } = require("../utils/UserValidation");
 const ApiError = require("../utils/ApiError");
-const bcrypt = require("bcrypt");
-const saltRounds = Number(process.env.SALT_ROUNDS);
 
 
 class UserService {
@@ -52,7 +50,6 @@ class UserService {
       }
 
       delete userData.confirmPassword;
-      userData.password = await bcrypt.hash(userData.password, saltRounds);
 
       const newUser = await userRepository.createUser(userData);
       delete newUser.password;
@@ -148,11 +145,6 @@ class UserService {
           confirmPassword
         );
         if (passwordError) return passwordError;
-
-        dataToUpdate.password = await bcrypt.hash(
-          dataToUpdate.password,
-          saltRounds
-        );
       }
 
       if (dataToUpdate.zipcode) {
