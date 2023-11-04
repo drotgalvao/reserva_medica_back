@@ -1,20 +1,16 @@
-const userRepository = require("../repositories/UserRepository");
-const bcrypt = require("bcrypt");
+const authRepository = require("../repositories/AuthRepository");
 const jwt = require("jsonwebtoken");
 
 class AuthService {
   async login(email, password) {
-    const user = await userRepository.findUserByEmail(email);
+    const user = await authRepository.login(email, password);
 
     if (!user) {
-      return new Error("User not found");
+      return new Error("Usuário não encontrado");
     }
 
-    console.log(password , user)
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordCorrect) {
-      return new Error("Incorrect password");
+    if (!user.isPasswordCorrect) {
+      return new Error("Senha incorreta");
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
