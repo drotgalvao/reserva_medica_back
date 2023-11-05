@@ -21,6 +21,12 @@ class AuthController {
       res.status(500).json({ message: "Houve um erro interno" });
     }
   }
+
+  logout(req, res) {
+    res.cookie("token", "", { expires: new Date(0), httpOnly: true });
+    res.status(200).json({ message: "Logout bem-sucedido." });
+  }
+  
 }
 
 module.exports = new AuthController();
