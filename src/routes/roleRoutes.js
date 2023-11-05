@@ -1,12 +1,10 @@
 const express = require("express");
-const userController = require("../controllers/UserController");
+const roleController = require("../controllers/RoleController");
 
 const router = express.Router();
 
-// Define user as a doctor
-router.post("/users/:id/doctor", userController.defineAsDoctor);
+router.post("/:id/doctor", roleController.defineAsDoctor);
 
-// Define user as a patient
-router.post("/users/:id/patient", userController.defineAsPatient);
+router.post("/:id/patient", roleController.defineAsPatient);
 
 module.exports = router;
